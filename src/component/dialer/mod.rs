@@ -1,5 +1,5 @@
 use crate::constant::context::Context;
-use crate::constant::{Conn, HostPort, Transport, context};
+use crate::constant::{NetConn, HostPort, Transport, context};
 use crate::errors::Errors;
 use derive_builder::Builder;
 use paste::paste;
@@ -10,25 +10,28 @@ use tokio::net::{TcpStream, UdpSocket};
 
 #[derive(Builder, Clone, Default)]
 pub struct Options {
-    pub interface_name: Option<String>,
-    pub fallback_bind: Option<bool>,
-    pub addr_reuse: Option<bool>,
-    pub routing_mark: Option<i32>,
+    pub interface_name: String,
+    pub fallback_bind: bool,
+    pub addr_reuse: bool,
+    pub routing_mark: i32,
+    // 0,4,6 (must be)
     pub network: i32,
-    pub prefer: Option<i32>,
-    pub tfo: Option<bool>,
-    pub mp_tcp: Option<bool>,
+    // 0,4,6 (prefer ip4 or ip6)
+    pub prefer: i32,
+    pub tfo: bool,
+    pub mp_tcp: bool,
 }
 
 pub enum WithOptions {
-    InterfaceName(Option<String>),
-    FallbackBind(Option<bool>),
-    AddrReuse(Option<bool>),
-    RoutingMark(Option<i32>),
+    InterfaceName(String),
+    FallbackBind(bool),
+    AddrReuse(bool),
+    RoutingMark(i32),
     Network(i32),
-    Prefer(Option<i32>),
-    TFO(Option<bool>),
-    MPTCP(Option<bool>),
+    Prefer(i32),
+    TFO(bool),
+    MPTCP(bool),
+    Nothing
 }
 
 impl WithOptions {
@@ -42,6 +45,7 @@ impl WithOptions {
             WithOptions::Prefer(val) => opts.prefer = val,
             WithOptions::TFO(val) => opts.tfo = val,
             WithOptions::MPTCP(val) => opts.mp_tcp = val,
+            WithOptions::Nothing => {}
         }
     }
 }
@@ -60,7 +64,7 @@ pub async fn dial_context(
     mut network: Transport,
     addr: &HostPort,
     options: Vec<WithOptions>,
-) -> Result<Conn, Errors> {
+) -> Result<NetConn, Errors> {
     let opts = apply_options(options);
     network = network.normalized(opts.network)?;
 
@@ -77,7 +81,7 @@ async fn actual_single_stack_dial_context(
     network: Transport,
     addr: &HostPort,
     options: &Options,
-) -> Result<Conn, Errors> {
+) -> Result<NetConn, Errors> {
     match addr {
         HostPort::IP(ip, port) => dial_context_internal(
             ctx, network, ip.clone(), port.clone(), options
@@ -91,17 +95,17 @@ async fn actual_dual_stack_dial_context(
     network: Transport,
     addr: &HostPort,
     options: &Options,
-) -> Result<Conn, Errors> {
+) -> Result<NetConn, Errors> {
     Err(Errors::NotImplemented)
 }
 
-pub trait NetDialer {
+pub trait NetDialer: Send + Sync {
     fn dial_context(
         &self,
         ctx: context::Context,
         network: &str,
         addr: &str,
-    ) -> Result<Conn, crate::errors::Errors>;
+    ) -> Result<NetConn, crate::errors::Errors>;
 }
 
 pub struct SystemDialer {}
@@ -119,7 +123,7 @@ impl SystemDialer {
 }
 
 impl NetDialer for SystemDialer {
-    fn dial_context(&self, ctx: Context, network: &str, addr: &str) -> Result<Conn, Errors> {
+    fn dial_context(&self, ctx: Context, network: &str, addr: &str) -> Result<NetConn, Errors> {
         todo!()
     }
 }
@@ -130,11 +134,11 @@ async fn dial_context_internal(
     addr: net::IpAddr,
     port: u16,
     options: &Options,
-) -> Result<Conn, Errors> {
+) -> Result<NetConn, Errors> {
     match network {
         Transport::TCP4 | Transport::TCP6 | Transport::TCP => {
             let conn = TcpStream::connect((addr, port)).await?;
-            Ok(Conn::TCP(conn))
+            Ok(NetConn::TCP(conn))
         }
         Transport::UDP | Transport::UDP4 | Transport::UDP6 => {
             let zero_addr: IpAddr = if addr.is_ipv4() {
@@ -144,7 +148,7 @@ async fn dial_context_internal(
             };
             let udp = UdpSocket::bind((zero_addr, 0)).await?;
             udp.connect((addr, port)).await?;
-            Ok(Conn::UDP(udp))
+            Ok(NetConn::UDP(udp))
         }
     }
 }

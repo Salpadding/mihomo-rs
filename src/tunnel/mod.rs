@@ -3,12 +3,13 @@ use crate::constant;
 use crate::constant::Transport::TCP;
 use crate::constant::context::Context;
 use crate::constant::metadata::Metadata;
-use crate::constant::{Conn, HostPort, ProxyAdapter};
+use crate::constant::{NetConn, HostPort, ProxyAdapter};
 use crate::errors::Errors;
 use async_trait::async_trait;
 use std::io::Error;
 use std::sync::{Arc, RwLock};
 use tokio::net::{TcpStream, UdpSocket};
+use crate::constant::types::UDPPacket;
 
 pub struct Tunnel {}
 
@@ -41,7 +42,7 @@ impl constant::Tunnel for Tunnel {
             .await?;
 
         match conn {
-            Conn::TCP(mut outbound) => {
+            NetConn::TCP(mut outbound) => {
                 let (x, y) = tokio::io::copy_bidirectional(&mut inbound, &mut outbound).await?;
                 Ok(())
             }
@@ -51,7 +52,7 @@ impl constant::Tunnel for Tunnel {
         }
     }
 
-    fn handle_udp_packet(&self, socket: UdpSocket, metadata: &Metadata) {
+    fn handle_udp_packet(&self, socket: &dyn UDPPacket, metadata: Box<Metadata>) {
         todo!()
     }
 

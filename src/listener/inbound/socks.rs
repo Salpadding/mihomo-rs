@@ -1,6 +1,6 @@
 use crate::constant::{InboundListener, Tunnel};
 
-use crate::constant::metadata::{Metadata, MetadataBuilder, Network, SourceType};
+use crate::constant::metadata::{Metadata, MetadataBuilder, DialerNetwork, SourceType};
 use crate::errors::Errors;
 use async_trait::async_trait;
 use fast_socks5::util::target_addr::TargetAddr;
@@ -71,7 +71,7 @@ impl Socks {
 
         match cmd {
             Socks5Command::TCPConnect => {
-                meta.network = Network::TCP;
+                meta.network = DialerNetwork::TCP;
                 Ok(())
             }
             _ => Err(Errors::UnSupportedSocks5Command(cmd)),

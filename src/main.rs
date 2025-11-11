@@ -7,6 +7,7 @@ mod constant;
 mod adapter;
 mod errors;
 mod component;
+mod common;
 
 #[tokio::main]
 async fn main() {

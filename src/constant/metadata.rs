@@ -3,17 +3,17 @@ use std::net;
 use derive_builder::Builder;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub enum Network {
+pub enum DialerNetwork {
     Unknown,
     TCP,
     UDP,
-    ALLNet2,
+    ALLNet,
     InvalidNet,
 }
 
-impl Default for Network {
+impl Default for DialerNetwork {
     fn default() -> Self {
-        Network::Unknown
+        DialerNetwork::Unknown
     }
 }
 
@@ -47,7 +47,7 @@ impl Default for SourceType {
 #[derive(Clone, Debug, Serialize, Deserialize, Default, Builder)]
 #[serde(rename_all = "camelCase")]
 pub struct Metadata {
-    pub network: Network,
+    pub network: DialerNetwork,
     pub r#type: SourceType,
 
     #[serde( skip_serializing_if = "Option::is_none" )]
@@ -117,5 +117,9 @@ impl Metadata {
     // TODO: implement unwrap_ip, unwrap (IPv4-mapped IPv6 address) into ip4
     pub fn unwrap_ip(&mut self) {
 
+    }
+    
+    pub fn resolved(&self) -> bool {
+        self.destination_ip.is_some()
     }
 }

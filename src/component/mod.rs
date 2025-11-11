@@ -1,4 +1,4 @@
-use crate::constant::{context, Conn};
+use crate::constant::{context, NetConn};
 use crate::errors::Errors;
 
 pub mod dialer;
