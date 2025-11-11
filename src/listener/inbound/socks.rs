@@ -10,13 +10,18 @@ use fast_socks5::{
 };
 use std::net::SocketAddr;
 use tokio::net::{TcpListener, TcpStream};
+use crate::constant::listener::InboundConfig;
+use self::super::base::Base;
 
 pub struct Socks {
+    base: Base
 }
 
 impl Socks {
     pub fn new() -> Self {
-        Socks {}
+        Socks {
+            base: Base::default(),
+        }
     }
 }
 
@@ -38,6 +43,18 @@ impl InboundListener for Socks {
             }
         }
         Ok(())
+    }
+
+    fn address(&self) -> String {
+        todo!()
+    }
+
+    fn raw_address(&self) -> String {
+        todo!()
+    }
+
+    fn config(&self) -> &dyn InboundConfig {
+        todo!()
     }
 }
 

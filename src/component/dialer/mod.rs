@@ -83,7 +83,7 @@ async fn actual_single_stack_dial_context(
     options: &Options,
 ) -> Result<NetConn, Errors> {
     match addr {
-        HostPort::IP(ip, port) => dial_context_internal(
+        HostPort::Ip(ip, port) => dial_context_internal(
             ctx, network, ip.clone(), port.clone(), options
         ).await,
         HostPort::Domain(_, _) => Err(Errors::NotImplemented),

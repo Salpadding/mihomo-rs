@@ -28,7 +28,7 @@ impl constant::Tunnel for Tunnel {
     ) -> Result<(), Errors> {
         let adapter = self.resolve_metadata(&metadata);
         let host_port = if let Some(hp) = &metadata.destination_ip {
-            HostPort::IP(hp.clone(), metadata.destination_port)
+            HostPort::Ip(hp.clone(), metadata.destination_port)
         } else {
             HostPort::Domain(metadata.host.clone(), metadata.destination_port)
         };

@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 use tokio::net::{TcpStream, UdpSocket};
 use crate::errors::Errors;
@@ -72,7 +73,21 @@ impl Transport {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HostPort {
     Domain(String, u16),
-    IP(std::net::IpAddr, u16),
+    Ip(std::net::IpAddr, u16),
+}
+
+impl Display for HostPort {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HostPort::Domain(domain, port) => write!(f, "{}:{}", domain, port),
+            HostPort::Ip(ip, port) => {
+                match ip {
+                    std::net::IpAddr::V4(ipv4) => write!(f, "{}:{}", ipv4, port),
+                    std::net::IpAddr::V6(ipv6) => write!(f, "[{}]:{}", ipv6, port),
+                }
+            }
+        }
+    }
 }
 
 // mapped to golang net.Conn

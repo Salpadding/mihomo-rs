@@ -4,14 +4,28 @@ use serde::{Deserialize, Serialize};
 pub enum DNSPrefer {
     Unknown,
     DualStack,
-    IPv4Only,
-    IPv6Only,
-    IPv4Prefer,
-    IPv6Prefer,
+    IpV4Only,
+    IpV6Only,
+    IpV4Prefer,
+    IpV6Prefer,
 }
 
 impl Default for DNSPrefer {
     fn default() -> Self {
         DNSPrefer::Unknown
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+pub enum DNSMode {
+    Normal,
+    FakeIp,
+    Mapping,
+    Hosts
+}
+
+impl Default for DNSMode {
+    fn default() -> Self {
+        DNSMode::Normal
     }
 }

@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct Range<T> {
     pub start: T,
     pub end: T,

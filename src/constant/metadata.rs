@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::net;
 use derive_builder::Builder;
+use crate::constant::dns::DNSMode;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum DialerNetwork {
@@ -61,9 +62,9 @@ pub struct Metadata {
     pub destination_geo_ip: Vec<String>,
 
     #[serde(default, skip_serializing_if = "String::is_empty")]
-    pub source_ipasn: String,
+    pub source_ip_asn: String,
     #[serde(default, skip_serializing_if = "String::is_empty")]
-    pub destination_ipasn: String,
+    pub destination_ip_asn: String,
 
     #[serde(default)]
     pub source_port: u16,
@@ -84,7 +85,7 @@ pub struct Metadata {
     pub host: String,
 
     #[serde(default)]
-    pub dns_mode: String,
+    pub dns_mode: DNSMode,
 
     #[serde(default)]
     pub uid: u32,
@@ -105,9 +106,9 @@ pub struct Metadata {
     pub dscp: u8,
 
     #[serde(skip)]
-    pub raw_source_addr: Option<String>,
+    pub raw_source_addr: Option<net::SocketAddr>,
     #[serde(skip)]
-    pub raw_destination_addr: Option<String>,
+    pub raw_destination_addr: Option<net::SocketAddr>,
 
     #[serde(default, skip_serializing_if = "String::is_empty")]
     pub sniff_host: String,

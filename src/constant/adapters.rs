@@ -152,10 +152,10 @@ impl ProxyAdapter for Base {
             WithOptions::InterfaceName(self.interface.clone()),
             WithOptions::RoutingMark(self.routing_mark),
             match self.prefer {
-                DNSPrefer::IPv4Only => WithOptions::Network(4),
-                DNSPrefer::IPv6Only => WithOptions::Network(6),
-                DNSPrefer::IPv4Prefer => WithOptions::Prefer(4),
-                DNSPrefer::IPv6Prefer => WithOptions::Prefer(6),
+                DNSPrefer::IpV4Only => WithOptions::Network(4),
+                DNSPrefer::IpV6Only => WithOptions::Network(6),
+                DNSPrefer::IpV4Prefer => WithOptions::Prefer(4),
+                DNSPrefer::IpV6Prefer => WithOptions::Prefer(6),
                 _ => WithOptions::Nothing
             },
             WithOptions::TFO(self.tfo),

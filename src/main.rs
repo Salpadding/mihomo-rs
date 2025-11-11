@@ -1,3 +1,5 @@
+#![feature(addr_parse_ascii)]
+
 use crate::constant::InboundListener;
 use crate::tunnel::Tunnel;
 
